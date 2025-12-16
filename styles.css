@@ -276,6 +276,14 @@ pre {
   align-items: start;
 }
 
+/* Equal-width 2-col grid (use inside .container; avoids .grid2's asymmetry + extra padding) */
+.figureGrid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
 .teaser {
   border-bottom: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
@@ -744,6 +752,9 @@ pre {
     grid-template-columns: 1fr;
   }
   .grid2 {
+    grid-template-columns: 1fr;
+  }
+  .figureGrid2 {
     grid-template-columns: 1fr;
   }
   .citeGrid {

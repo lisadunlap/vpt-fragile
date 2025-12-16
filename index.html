@@ -125,28 +125,42 @@
             <article class="card">
               <h3 class="h3">Data size matters</h3>
               <p class="muted">
-                Placeholder summary: small sample sizes can lead to unstable rankings and misleading conclusions about model performance.
+                Random resampling of similarly-sized image subsets can substantially reorder model rankings, even when the subsets are statistically indistinguishable in difficulty. Small benchmark sizes amplify the impact of incidental sampling variation, making it difficult to distinguish genuine differences in model capability from sampling artifacts.
               </p>
             </article>
             <article class="card">
               <h3 class="h3">Marker style matters</h3>
               <p class="muted">
-                Placeholder summary: changes in marker size/shape/color/label placement can cause large
-                accuracy swings on the same examples.
+                Seemingly irrelevant design choices—such as switching a red circle to a blue square—can cause accuracy swings of up to 21% on the exact same image-question pairs. These fluctuations are severe enough to completely reshuffle leaderboards, effectively allowing weaker models to rank above stronger ones based solely on marker style.
               </p>
             </article>
             <article class="card">
               <h3 class="h3">Implementation subtleties</h3>
               <p class="muted">
-                Placeholder summary: JPEG compression / inference-time details can significantly change outcomes.
+                JPEG compression quality—a factor imperceptible to human evaluators—produces statistically significant changes in accuracy and rankings on visually prompted tasks. Importantly, these effects are specific to visual prompting; applying the same intervention to traditional VLM benchmarks shows negligible impact.
               </p>
             </article>
           </div>
 
           <h3 class="h2" style="margin-top: 3rem; margin-bottom: 1rem;">Sample size matters</h3>
           <p class="muted" style="margin-bottom: 2rem; line-height: 1.6;">
-            Placeholder content about sample size.
+            Existing visually prompted benchmarks like BLINK are surprisingly small, with only 224 samples for tasks like relative depth estimation and semantic correspondence. Random resampling of image subsets matched in size to BLINK from a larger pool can substantially reorder model rankings, even when the subsets are statistically indistinguishable in difficulty. This finding reveals that small benchmark sizes amplify the impact of incidental sampling variation, making it difficult to distinguish genuine differences in model capability from sampling artifacts.
           </p>
+
+          <div class="figureGrid2" style="margin-bottom: 2rem;">
+            <div>
+              <img src="assets/figures/DA2k_rank_heatmap_data_splits.png" alt="DA2k ranking heatmap across data splits" style="width: 100%; height: auto;">
+              <p class="muted lbCaption" style="margin-top: 10px;">
+                <strong>DA2k:</strong> Model rankings across different data splits.
+              </p>
+            </div>
+            <div>
+              <img src="assets/figures/SPair-71k_rank_heatmap_data_splits.png" alt="SPair ranking heatmap across data splits" style="width: 100%; height: auto;">
+              <p class="muted lbCaption" style="margin-top: 10px;">
+                <strong>SPair-71k:</strong> Model rankings across different data splits.
+              </p>
+            </div>
+          </div>
 
           <h3 class="h2" style="margin-top: 3rem; margin-bottom: 1rem;">Visual Marker Matters</h3>
           <p class="muted" style="margin-bottom: 2rem; line-height: 1.6;">
@@ -210,8 +224,8 @@
             Even ostensibly irrelevant implementation details can significantly impact model performance on visually prompted tasks. We find that JPEG compression quality—a factor imperceptible to human evaluators—produces statistically significant changes in accuracy and rankings. Importantly, these compression effects are specific to visually prompted benchmarks; applying the same intervention to traditional VLM benchmarks like MMBench shows negligible impact, highlighting the unique fragility of visual prompting evaluations.
           </p>
 
-          <div class="chartPanel" style="width: 80%; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
-            <div id="jpegRankChart" class="plotlyChart" style="min-height: 420px;"></div>
+          <div class="chartPanel" style="width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+            <img src="assets/figures/jpeg_compression.png" alt="JPEG compression quality effects on model rankings" style="width: 100%; height: auto;">
             <p class="muted lbCaption" style="margin-top: 10px;">
               <strong>Figure 3.</strong> JPEG compression quality can reorder rankings on visually prompted tasks (BLINK RD),
               while rankings on traditional benchmarks (MME) remain comparatively stable.
@@ -436,33 +450,6 @@
               <strong>Figure</strong>: Performance comparison — optimizing for InternVL3-8B's ranking on
               BLINK relative depth by changing the visual marker.
             </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="vpbench">
-        <div class="container">
-          <h2 class="h2">VPBench</h2>
-          <p class="muted">
-            Placeholder section for your benchmark release: dataset description, scale, tasks, and how to use it.
-          </p>
-
-          <div class="grid2">
-            <div class="card card--soft">
-              <h3 class="h3">What’s included</h3>
-              <ul class="bullets">
-                <li><strong>Datasets</strong>: BLINK, DA2k, SPair (curated/expanded)</li>
-                <li><strong>Marker variants</strong>: 16 styles</li>
-                <li><strong>Tools</strong>: analysis + reference inference (placeholder)</li>
-              </ul>
-            </div>
-            <div class="card card--soft">
-              <h3 class="h3">How to cite / access</h3>
-              <p class="muted">
-                Add links to the data repository and a short “getting started” snippet.
-              </p>
-              <a class="btn btn--primary" href="#" aria-disabled="true">Download VPBench (placeholder)</a>
-            </div>
           </div>
         </div>
       </section>

@@ -135,6 +135,22 @@ function updateVisualization(markerKey) {
   const selectedData = datasetData[markerKey] || defaultData;
   const models = datasetData.models;
 
+  // Calculate accuracy deltas for display
+  const deltas = models.map((model, i) => {
+    const delta = selectedData.accuracies[i] - defaultData.accuracies[i];
+    return delta;
+  });
+
+  // Color based on delta: green for positive, red for negative, grey for zero
+  const deltaColors = deltas.map(d => {
+    if (d > 0) return '#10b981'; // green
+    if (d < 0) return '#ef4444'; // red
+    return '#6b7280'; // grey
+  });
+
+  // Font sizes - explicitly set for each bar to ensure consistency
+  const fontSizes = models.map(() => 12);
+
   // Update Plotly bar chart
   const trace1 = {
     x: models,
@@ -148,7 +164,13 @@ function updateVisualization(markerKey) {
     y: selectedData.accuracies,
     name: markerKey === "default" ? "Default" : markerKey.replace(/_/g, " "),
     type: "bar",
-    marker: { color: "rgba(20, 184, 166, 0.7)" }
+    marker: { color: "rgba(20, 184, 166, 0.7)" },
+    text: deltas.map(d => d >= 0 ? `+${d.toFixed(1)}` : d.toFixed(1)),
+    textposition: 'outside',
+    textfont: { 
+      size: fontSizes, 
+      color: deltaColors 
+    }
   };
 
   // Set y-axis range based on dataset
@@ -333,7 +355,7 @@ function renderJpegRankChart(rows) {
         line: { color: "rgba(11, 18, 32, 0.75)", width: 2 },
         showlegend: false,
         xaxis: `x${axisSuffix}`,
-        yaxis: `y${axisSuffix}`,
+        yaxis: "y",
       },
       {
         type: "scatter",
@@ -345,13 +367,12 @@ function renderJpegRankChart(rows) {
         marker: { color: "rgba(11, 18, 32, 0.9)", size: 10 },
         showlegend: false,
         xaxis: `x${axisSuffix}`,
-        yaxis: `y${axisSuffix}`,
+        yaxis: "y",
       }
     );
   });
 
   const layout = {
-    grid: { rows: 1, columns: 2, pattern: "independent" },
     margin: { l: 160, r: 30, t: 60, b: 50 },
     font: { family: "Avenir Next, Avenir, sans-serif" },
     paper_bgcolor: "rgba(0,0,0,0)",
@@ -359,7 +380,7 @@ function renderJpegRankChart(rows) {
     annotations: [
       {
         text: "BLINK Relative Depth",
-        x: 0.22,
+        x: 0.225,
         y: 1.12,
         xref: "paper",
         yref: "paper",
@@ -368,7 +389,7 @@ function renderJpegRankChart(rows) {
       },
       {
         text: "MME (semantic)",
-        x: 0.78,
+        x: 0.775,
         y: 1.12,
         xref: "paper",
         yref: "paper",
@@ -377,6 +398,7 @@ function renderJpegRankChart(rows) {
       },
     ],
     xaxis: {
+      domain: [0, 0.45],
       title: "Rank",
       tickmode: "linear",
       tick0: 1,
@@ -385,6 +407,7 @@ function renderJpegRankChart(rows) {
       gridcolor: "rgba(11, 18, 32, 0.06)",
     },
     xaxis2: {
+      domain: [0.55, 1],
       title: "Rank",
       tickmode: "linear",
       tick0: 1,
@@ -397,14 +420,6 @@ function renderJpegRankChart(rows) {
       type: "category",
       categoryorder: "array",
       categoryarray: yCategoryArrays.BLINK_RD || [],
-      automargin: true,
-      gridcolor: "rgba(11, 18, 32, 0.06)",
-    },
-    yaxis2: {
-      title: "Model",
-      type: "category",
-      categoryorder: "array",
-      categoryarray: yCategoryArrays.MME || [],
       automargin: true,
       gridcolor: "rgba(11, 18, 32, 0.06)",
     },
