@@ -56,10 +56,9 @@
 
         <div class="ctaRow">
           <!-- Replace # with real links when ready -->
-          <a class="btn btn--primary" href="#" aria-disabled="true">Paper (PDF)</a>
-          <a class="btn btn--ghost" href="#" aria-disabled="true">arXiv</a>
-          <a class="btn btn--ghost" href="#" aria-disabled="true">Code</a>
-          <a class="btn btn--ghost" href="#" aria-disabled="true">Data</a>
+          <a class="btn btn--primary" href="#" aria-disabled="true">Paper</a>
+          <a class="btn btn--ghost" href="#" aria-disabled="true">Code (Coming soon)</a>
+          <a class="btn btn--ghost" href="#" aria-disabled="true">Data (Coming soon)</a>
         </div>
       </section>
     </header>
@@ -75,7 +74,7 @@
               style="width: 100%; display: block; background: #fff;"
             />
             <figcaption class="caption">
-              <strong>Figure 1.</strong> Small, seemingly irrelevant changes in visual prompting dramatically alter VLM predictions. Left: Qwen2.5-VL accuracy under different visual marker variants. Right: such variations can reorder entire leaderboards, with model rankings shifting even when nothing about the underlying task changes.
+              <strong>Small, seemingly irrelevant changes in visual prompting dramatically alter VLM predictions.</strong> Left: Qwen2.5-VL accuracy under different visual marker variants. Right: such variations can reorder entire leaderboards, with model rankings shifting even when nothing about the underlying task changes.
             </figcaption>
           </figure>
         </div>
@@ -85,7 +84,11 @@
         <div class="container">
           <h2 class="h2">Abstract</h2>
           <p class="abstract">
-            A key challenge in evaluating VLMs is testing models' ability to analyze visual content independently from their textual priors. Recent benchmarks probe visual perception through visual prompting, where questions about visual content are paired with coordinates to which the question refers, with the coordinates explicitly marked in the image itself. While these benchmarks are an important part of VLM evaluation, we find that existing models are surprisingly fragile to seemingly irrelevant details of visual prompting: simply changing a visual marker from red to blue can completely change rankings among models on a leaderboard. By evaluating nine modern open- and closed-source VLMs on two visually prompted tasks, we demonstrate how details in benchmark setup, including visual marker design and dataset size, have a significant influence on model performance and leaderboard rankings. These effects can even be exploited to lift weaker models above stronger ones; for instance, slightly increasing the size of the visual marker results in InternVL3-8B ranking alongside or better than much larger models like Gemini 2.5 Pro. Furthermore, we find that even ostensibly irrelevant modeling and inference decisions like JPEG compression can change the model lineup while similar interventions to non-visually prompted tasks have little effect on the results. To address this instability, we curate existing datasets to create VPBench, a larger visually prompted benchmark with 16 visual marker variants. We open-source this benchmark as well as our analysis tools to further facilitate robust evaluation of VLMs.
+            A key challenge in evaluating VLMs is testing models' ability to analyze visual content independently from their textual priors. Recent benchmarks such as BLINK probe visual perception through <em>visual prompting</em>, where questions about visual content are paired with coordinates to which the question refers, with the coordinates explicitly marked in the image itself. While these benchmarks are an important part of VLM evaluation, we find that existing models are surprisingly fragile to seemingly irrelevant details of visual prompting: simply changing a visual marker from red to blue can completely change rankings among models on a leaderboard. By evaluating nine commonly-used open- and closed-source VLMs on two visually prompted tasks, we demonstrate how details in benchmark setup, including visual marker design and dataset size, have a significant influence on model performance and leaderboard rankings.
+            <br /><br />
+            These effects can even be exploited to <strong>lift weaker models above stronger ones</strong>; for instance, slightly increasing the size of the visual marker results in open-source InternVL3-8B ranking alongside or better than much larger proprietary models like Gemini 2.5 Pro. We further show that low-level inference choices that are often ignored in benchmarking, such as JPEG compression levels in API calls, can also cause model lineup changes. These details have substantially larger impacts on visually prompted benchmarks than on conventional semantic VLM evaluations.
+            <br /><br />
+            To mitigate this instability, we curate existing datasets to create VPBench, a larger visually prompted benchmark with 16 visual marker variants.
           </p>
         </div>
       </section>
@@ -110,7 +113,7 @@
                   style="width: 100%; display: block; background: #fff;"
                 />
                 <figcaption class="caption">
-                  <strong>Figure 2.</strong> Examples of visually prompted tasks including relative depth estimation and semantic correspondence.
+                  <strong>Examples of visually prompted tasks.</strong> Relative depth estimation and semantic correspondence.
                 </figcaption>
               </figure>
             </div>
@@ -131,13 +134,13 @@
             <article class="card">
               <h3 class="h3">Marker style matters</h3>
               <p class="muted">
-                Seemingly irrelevant design choices—such as switching a red circle to a blue square—can cause accuracy swings of up to 21% on the exact same image-question pairs. These fluctuations are severe enough to completely reshuffle leaderboards, effectively allowing weaker models to rank above stronger ones based solely on marker style.
+                Seemingly irrelevant design choices, such as switching a red circle to a blue square, can cause accuracy swings of up to 21% on the exact same image-question pairs. These fluctuations are severe enough to completely reshuffle leaderboards, effectively allowing weaker models to rank above stronger ones based solely on marker style.
               </p>
             </article>
             <article class="card">
               <h3 class="h3">Implementation subtleties</h3>
               <p class="muted">
-                JPEG compression quality—a factor imperceptible to human evaluators—produces statistically significant changes in accuracy and rankings on visually prompted tasks. Importantly, these effects are specific to visual prompting; applying the same intervention to traditional VLM benchmarks shows negligible impact.
+                JPEG compression quality, a factor imperceptible to human evaluators, produces statistically significant changes in accuracy and rankings on visually prompted tasks. Importantly, these effects are specific to visual prompting; applying the same intervention to traditional VLM benchmarks shows negligible impact.
               </p>
             </article>
           </div>
@@ -147,24 +150,21 @@
             Existing visually prompted benchmarks like BLINK are surprisingly small, with only 224 samples for tasks like relative depth estimation and semantic correspondence. Random resampling of image subsets matched in size to BLINK from a larger pool can substantially reorder model rankings, even when the subsets are statistically indistinguishable in difficulty. This finding reveals that small benchmark sizes amplify the impact of incidental sampling variation, making it difficult to distinguish genuine differences in model capability from sampling artifacts.
           </p>
 
-          <div class="figureGrid2" style="margin-bottom: 2rem;">
+          <div class="figureGrid2" style="margin-bottom: 0.75rem;">
             <div>
               <img src="assets/figures/DA2k_rank_heatmap_data_splits.png" alt="DA2k ranking heatmap across data splits" style="width: 100%; height: auto;">
-              <p class="muted lbCaption" style="margin-top: 10px;">
-                <strong>DA2k:</strong> Model rankings across different data splits.
-              </p>
             </div>
             <div>
               <img src="assets/figures/SPair-71k_rank_heatmap_data_splits.png" alt="SPair ranking heatmap across data splits" style="width: 100%; height: auto;">
-              <p class="muted lbCaption" style="margin-top: 10px;">
-                <strong>SPair-71k:</strong> Model rankings across different data splits.
-              </p>
             </div>
           </div>
+          <p class="muted lbCaption" style="margin-top: 10px; margin-bottom: 2rem;">
+            <strong>Ranking instability across splits.</strong> Model rankings across 1,000 independent 100-sample splits for DA2k and SPair-71k, with the first 10 splits visualized on the x-axis, revealing substantial ranking volatility caused solely by i.i.d. resampling.
+          </p>
 
           <h3 class="h2" style="margin-top: 3rem; margin-bottom: 1rem;">Visual Marker Matters</h3>
           <p class="muted" style="margin-bottom: 2rem; line-height: 1.6;">
-            We evaluated models across 16 distinct visual marker styles, systematically varying attributes like color, shape, size, and label placement to test robustness. We found that seemingly irrelevant design choices—such as switching a red circle to a blue square—can cause accuracy swings of up to 21% on the exact same image-question pairs. These fluctuations are severe enough to completely reshuffle leaderboards, effectively allowing weaker models to rank above stronger ones based solely on the style of the visual prompt.
+            We evaluated models across 16 distinct visual marker styles, systematically varying attributes like color, shape, size, and label placement to test robustness. We found that seemingly irrelevant design choices—such as switching a red circle to a blue square—can cause accuracy swings of up to 21% on the exact same image-question pairs. These fluctuations are severe enough to completely reshuffle leaderboards, effectively allowing weaker models to rank above stronger ones based solely on the style of the visual prompt. To help make this sensitivity measurable (and harder to ignore), we introduce <strong>VPBench</strong>: expanded, marker-diverse versions of existing visually prompted datasets that evaluate each example under multiple marker variants.
           </p>
 
           <!-- Interactive marker comparison -->
@@ -214,20 +214,20 @@
             </div>
 
             <p class="muted lbCaption">
-              <strong>Figure 6 (interactive)</strong>: Accuracy and ranking changes across marker variants.
+              <strong>Small marker changes cause large, model-specific accuracy shifts and rank shuffles.</strong>
               Select a dataset and marker above to compare with the default evaluation.
             </p>
           </div>
 
           <h3 class="h2" style="margin-top: 3rem; margin-bottom: 1rem;">Low level implementation details matter</h3>
-          <p class="muted" style="line-height: 1.6; font-size: 16px; max-width: 82ch; margin-bottom: 1.5rem;">
+          <p class="muted" style="line-height: 1.6; font-size: 16px; margin-bottom: 1.5rem;">
             Even ostensibly irrelevant implementation details can significantly impact model performance on visually prompted tasks. We find that JPEG compression quality—a factor imperceptible to human evaluators—produces statistically significant changes in accuracy and rankings. Importantly, these compression effects are specific to visually prompted benchmarks; applying the same intervention to traditional VLM benchmarks like MMBench shows negligible impact, highlighting the unique fragility of visual prompting evaluations.
           </p>
 
           <div class="chartPanel" style="width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
             <img src="assets/figures/jpeg_compression.png" alt="JPEG compression quality effects on model rankings" style="width: 100%; height: auto;">
             <p class="muted lbCaption" style="margin-top: 10px;">
-              <strong>Figure 3.</strong> JPEG compression quality can reorder rankings on visually prompted tasks (BLINK RD),
+              <strong>JPEG Compression can change ranks.</strong> JPEG compression quality can reorder rankings on visually prompted tasks (BLINK RD),
               while rankings on traditional benchmarks (MME) remain comparatively stable.
             </p>
           </div>
@@ -447,10 +447,30 @@
             </div>
 
             <p class="muted lbCaption">
-              <strong>Figure</strong>: Performance comparison — optimizing for InternVL3-8B's ranking on
+              <strong>Leaderboards can be manipulated.</strong> Performance comparison — optimizing for InternVL3-8B's ranking on
               BLINK relative depth by changing the visual marker.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section class="section" id="conclusion">
+        <div class="container">
+          <h2 class="h2">Conclusion</h2>
+          <p class="muted" style="line-height: 1.6; font-size: 16px;">
+            Benchmarks should measure ability, not fragility. Yet our results reveal a gap: visually prompted evaluations
+            <span aria-label="opening quote">&ldquo;</span>fall short of this standard<span aria-label="closing quote">&rdquo;</span>:
+            change a marker’s color, shift its label, compress an image differently, and entire leaderboards reshuffle. These shifts are not noise but
+            structural weaknesses, revealing that today's perception-focused VLM benchmarks are far more sensitive than the field assumes.
+          </p>
+          <p class="muted" style="line-height: 1.6; font-size: 16px; margin-top: 1rem;">
+            Although our demonstrations center on BLINK-style tasks, the pattern is unlikely to be isolated. Any benchmark that depends on explicit
+            visual markup or fine-grained spatial cues risks similar instability. If leaderboards can be flipped by choices orthogonal to task semantics,
+            they cannot be trusted to track genuine progress. To address this, we recommend evaluations should diversify visual prompts, report variance
+            in addition to scores, and standardize low-level settings that silently influence results. Our expanded <strong>VPBench</strong> is a step in
+            that direction, offering larger, marker-diverse test sets that reduce incidental variance. Stable measurement is a prerequisite for meaningful
+            comparison; until then, visually prompted leaderboards may be telling us more about their construction than about the models they rank.
+          </p>
         </div>
       </section>
 
@@ -480,5 +500,6 @@
     <script src="script.js"></script>
   </body>
 </html>
+
 
 
