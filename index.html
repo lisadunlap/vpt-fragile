@@ -5,23 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
 
-    <!-- =========
-      Edit these fields to customize your paper site.
-      ========= -->
-    <title>Visually Prompted Benchmarks Are Surprisingly Fragile</title>
+    <title>Visually Prompted Tasks are Fragile</title>
     <meta
       name="description"
-      content="Project page for “Visually Prompted Benchmarks Are Surprisingly Fragile” (CVPR 2026 submission)."
+      content="A blog post on why visually prompted VLM benchmarks can be surprisingly fragile: dataset size, marker style, and even JPEG compression can shift leaderboards."
     />
 
     <!-- Open Graph (nice previews when sharing) -->
-    <meta property="og:title" content="Visually Prompted Benchmarks Are Surprisingly Fragile" />
+    <meta property="og:title" content="Visually Prompted Tasks are Fragile" />
     <meta
       property="og:description"
-      content="Project page."
+      content="Small, seemingly irrelevant details in visual prompting can shift accuracy and reorder VLM leaderboards."
     />
-    <!-- TODO: replace with a real preview image (1200x630 recommended) -->
-    <meta property="og:image" content="assets/figures/og-placeholder.png" />
+    <meta property="og:image" content="assets/figures/vpb_main.png" />
 
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" href="assets/favicon/icon.png" />
@@ -33,141 +29,140 @@
 
     <header class="header" id="top">
       <section class="hero">
-        <h1 class="hero__title">Visually Prompted Benchmarks Are Surprisingly Fragile</h1>
+        <p class="hero__kicker">Blog post</p>
+        <h1 class="hero__title">Visually Prompted Tasks are Fragile: small design changes can shift leaderboards</h1>
 
-        <!-- Authors -->
-        <p class="hero__authors">
-          <span class="author">Haiwen Feng</span><span class="sep">·</span>
-          <span class="author">Long Lian</span><span class="sep">·</span>
-          <span class="author">Lisa Dunlap</span><span class="sep">·</span>
-          <span class="author">Jiahao Shu</span><span class="sep">·</span>
-          <span class="author">XuDong Wang</span><span class="sep">·</span>
-          <span class="author">Renhao Wang</span><span class="sep">·</span>
-          <span class="author">Trevor Darrell</span><span class="sep">·</span>
-          <span class="author">Alane Suhr</span><span class="sep">·</span>
-          <span class="author">Angjoo Kanazawa</span>
-        </p>
-        <p class="hero__affils">UC Berkeley</p>
+        <p class="hero__authors"><span class="author">Lisa Dunlap</span> <span class="sep">·</span> <span class="author">UC Berkeley</span></p>
 
         <p class="hero__tagline">
-          Small, seemingly irrelevant details in visual prompting (marker style, sampling, compression)
-          can shift accuracy and reorder VLM leaderboards.
+          Small, seemingly irrelevant details in visual prompting (marker style, sampling, compression) can shift accuracy and reorder VLM leaderboards.
         </p>
-
-        <div class="ctaRow">
-          <!-- Replace # with real links when ready -->
-          <a class="btn btn--primary" href="#" aria-disabled="true">Paper</a>
-          <a class="btn btn--ghost" href="#" aria-disabled="true">Code (Coming soon)</a>
-          <a class="btn btn--ghost" href="#" aria-disabled="true">Data (Coming soon)</a>
-        </div>
       </section>
     </header>
 
     <main id="main" class="main">
-      <section class="section teaser" aria-label="Teaser">
+      <section class="section" id="intro">
         <div class="container">
-          <figure class="mediaCard">
-            <img 
-              src="assets/figures/vpb_main.png" 
-              alt="Visually Prompted Tasks are Fragile: small design changes can shift leaderboards"
-              class="video"
-              style="width: 100%; display: block; background: #fff;"
-            />
+
+          <div class="prose">
+            <p>
+              For those who are not up to date with the state of evaluation in computer vision, a key question that everyone wants to answer is
+              how good is my model at seeing vs how good is my model at thinking. In other words, how can I measure a model’s visual skills
+              independent of its semantic knowledge?
+            </p>
+            <p>
+              This is a harder task than you might think — many visual question answering samples rely heavily on world knowledge: if my model got
+              the question below wrong, it’s hard to determine if it is because it doesn’t recognize this as a tower or because it doesn’t know that
+              this particular tower is in Paris.
+            </p>
+            <figure class="mediaCard" style="margin: 18px auto; width: 70%; max-width: 100%;">
+              <img
+                src="assets/figures/tower.jpeg"
+                alt="A tower photo used as an example of a world-knowledge-heavy visual question."
+                style="width: 100%; display: block; background: #fff;"
+              />
+              <figcaption class="caption">
+                <strong>Question:</strong> in what city was this photo taken?
+              </figcaption>
+            </figure>
+            <p>
+              One such benchmark that aims to measure this pure visual capabilities is called <strong>BLINK</strong>, containing problems that humans
+              can solve in “the blink of an eye”, indicating that they require more visual processing than pure world knowledge. These tasks are things
+              like determining which object in the image is closer to the camera or where objects are in relation to one another.
+            </p>
+            <p>
+              Datasets like BLINK has incredibly high human performance but very low VLM performance, with some top models doing only slightly better
+              than chance, and this has caused it to become a very popular benchmark for up in coming VLMs.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="issue">
+        <div class="container">
+          <div class="prose">
+            <p>
+              <strong>So what’s the issue?</strong>
+              Well several of these tasks are visually prompted, meaning a marker is placed within the image to assist in the task. While this altering
+              of the image may seem inconsequential, we find that these visually prompted tasks are incredibly fragile: simply changing the marker from
+              red to blue can completely alter the leaderboard.
+            </p>
+            <figure class="mediaCard" style="margin: 18px 0;">
+              <img
+                src="assets/figures/vpb_main.png"
+                alt="Visually Prompted Tasks are Fragile: small design changes can shift leaderboards"
+                style="width: 100%; display: block; background: #fff;"
+              />
+              <figcaption class="caption">
+                <strong>Visually Prompted Tasks are Fragile:</strong> small design changes can shift leaderboards.
+              </figcaption>
+            </figure>
+            <p>
+              In this post we will delve into the different sources of fragility for these types of benchmarks and provide some guidance on how we can
+              improve upon them. While we use BLINK as an example of a popular dataset containing visually prompted tasks, this instability is seen across
+              these sorts of visually prompted tasks in general (we &lt;3 BLINK). To see how these changes affect leaderboards, we evaluate across 9 commonly
+              used VLM’s.
+            </p>
+            <p><strong>Ready?</strong> Let’s jump in.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="dataset-size">
+        <div class="container">
+          <h2 class="h2">Source #1: dataset size</h2>
+          <div class="prose">
+            <p>
+              First let’s get a glaring source of instability out of the way: dataset size. Each per-task dataset split of blink is 100–200 samples,
+              which may seem like a reasonable amount, but since these tasks often get low accuracy (often only slightly above chance), the confidence
+              intervals are huge.
+            </p>
+            <p>
+              To show this, we created our own visually prompted benchmark VPBench, consisting of two tasks: relative depth and semantic correspondence.
+              These datasets have around 10x the samples and thus much smaller confidence intervals. However, if we randomly create BLINK-sized data splits
+              from VPBench, we still see that the model leaderboard across splits differs significantly.
+            </p>
+          </div>
+
+          <figure class="mediaCard" style="margin: 12px 0;">
+            <div style="padding: 14px;">
+              <div class="figureGrid2" style="margin-bottom: 0;">
+                <div>
+                  <div class="imgCrop imgCrop--top10" style="width: 80%; margin: 0 auto;">
+                    <img src="assets/figures/DA2k_rank_heatmap_data_splits.png" alt="VPBench Relative Depth ranking heatmap across data splits" style="width: 100%; height: auto; display: block;">
+                  </div>
+                </div>
+                <div>
+                  <div class="imgCrop imgCrop--top10" style="width: 80%; margin: 0 auto;">
+                    <img src="assets/figures/SPair-71k_rank_heatmap_data_splits.png" alt="VPBench Semantic Correspondence ranking heatmap across data splits" style="width: 100%; height: auto; display: block;">
+                  </div>
+                </div>
+              </div>
+            </div>
             <figcaption class="caption">
-              <strong>Small, seemingly irrelevant changes in visual prompting dramatically alter VLM predictions.</strong> Left: Qwen2.5-VL accuracy under different visual marker variants. Right: such variations can reorder entire leaderboards, with model rankings shifting even when nothing about the underlying task changes.
+              <strong>Ranking instability across splits.</strong> Model rankings across 1,000 independent 100-sample splits for DA2k and SPair-71k, with the first 10 splits visualized on the x-axis, revealing substantial ranking volatility caused solely by i.i.d. resampling.
             </figcaption>
           </figure>
         </div>
       </section>
 
-      <section class="section" id="abstract">
+      <section class="section" id="marker-style">
         <div class="container">
-          <h2 class="h2">Abstract</h2>
-          <p class="abstract" style="text-align: center;">
-            A key challenge in evaluating VLMs is testing models' ability to analyze visual content independently from their textual priors. Recent benchmarks such as BLINK probe visual perception through <em>visual prompting</em>, where questions about visual content are paired with coordinates to which the question refers, with the coordinates explicitly marked in the image itself. While these benchmarks are an important part of VLM evaluation, we find that existing models are surprisingly fragile to seemingly irrelevant details of visual prompting: simply changing a visual marker from red to blue can completely change rankings among models on a leaderboard. By evaluating nine commonly-used open- and closed-source VLMs on two visually prompted tasks, we demonstrate how details in benchmark setup, including visual marker design and dataset size, have a significant influence on model performance and leaderboard rankings.
-            These effects can even be exploited to lift weaker models above stronger ones; for instance, slightly increasing the size of the visual marker results in open-source InternVL3-8B ranking alongside or better than much larger proprietary models like Gemini 2.5 Pro. We further show that low-level inference choices that are often ignored in benchmarking, such as JPEG compression levels in API calls, can also cause model lineup changes. These details have substantially larger impacts on visually prompted benchmarks than on conventional semantic VLM evaluations. To mitigate this instability, we curate existing datasets to create VPBench, a larger visually prompted benchmark with 16 visual marker variants.
-          </p>
-        </div>
-      </section>
-
-      <section class="section" id="visually-prompted-tasks">
-        <div class="container">
-          <h2 class="h2">What are visually prompted tasks?</h2>
-          <div class="grid2">
-            <div>
-              <p class="muted" style="margin-bottom: 1rem; font-size: 16px;">
-                Despite rapid progress in vision-language models (VLMs), their visual perception capabilities remain underexplored. <strong>Visual prompting</strong> has emerged as a targeted paradigm: by marking regions in an image with visual markers (such as circles, boxes, or dots) and posing spatial or perceptual questions, these tasks assess low-level visual understanding that humans solve effortlessly—problems we can answer "in a blink." This stands in contrast to the knowledge-centric reasoning required by benchmarks such as MME or MMMU.
-              </p>
-              <p class="muted" style="font-size: 16px;">
-                However, we find that model performance on these visually prompted evaluations is surprisingly sensitive to seemingly minor design choices in the benchmark itself. Variations in the size, style, or layout of visual markers can substantially affect accuracy and even reorder model rankings.
-              </p>
-            </div>
-            <div>
-              <figure class="mediaCard">
-                <img 
-                  src="assets/figures/vpt_tasks_examples.png" 
-                  alt="Examples of visually prompted tasks"
-                  style="width: 100%; display: block; background: #fff;"
-                />
-                <figcaption class="caption">
-                  <strong>Examples of visually prompted tasks.</strong> Relative depth estimation and semantic correspondence.
-                </figcaption>
-              </figure>
-            </div>
+          <h2 class="h2">Source #2: marker style</h2>
+          <div class="prose">
+            <p>
+              Next is marker style. This whole investigation actually started because we realized that within the BLINK dataset itself there are different
+              visual markers: sometimes they are red, sometimes they are white, sometimes the text is above the circle, sometimes it’s to the right.
+            </p>
+            <p>
+              While this detail may seem completely inconsequential, we found huge accuracy shifts if you change the color, shape or size. In fact, we see
+              that we can manipulate the leaderboard in our favor (or in someone else’s disfavor) simply by strategically choosing a marker style.
+            </p>
           </div>
-        </div>
-      </section>
-
-      <section class="section" id="results">
-        <div class="container">
-          <h2 class="h2">Key findings</h2>
-          <div class="cards">
-            <article class="card">
-              <h3 class="h3">Dataset size matters</h3>
-              <p class="muted">
-                Random resampling of similarly-sized image subsets can substantially reorder model rankings, even when the subsets are statistically indistinguishable in difficulty. Small benchmark sizes amplify the impact of incidental sampling variation, making it difficult to distinguish genuine differences in model capability from sampling artifacts.
-              </p>
-            </article>
-            <article class="card">
-              <h3 class="h3">Visual marker style matters</h3>
-              <p class="muted">
-                Seemingly irrelevant design choices, such as switching a red circle to a blue square, can cause accuracy swings of up to 21% on the exact same image-question pairs. These fluctuations are severe enough to completely reshuffle leaderboards, effectively allowing weaker models to rank above stronger ones based solely on marker style.
-              </p>
-            </article>
-            <article class="card">
-              <h3 class="h3">JPEG compression matters</h3>
-              <p class="muted">
-                JPEG compression quality, a factor imperceptible to human evaluators, produces statistically significant changes in accuracy and rankings on visually prompted tasks. Importantly, these effects are specific to visual prompting; applying the same intervention to traditional VLM benchmarks shows negligible impact.
-              </p>
-            </article>
-          </div>
-
-          <h3 class="h2" style="margin-top: 3rem; margin-bottom: 1rem;">Dataset size matters</h3>
-          <p class="muted" style="margin-bottom: 2rem; line-height: 1.6;">
-            Existing visually prompted benchmarks like BLINK are surprisingly small, with only 224 samples for tasks like relative depth estimation and semantic correspondence. Random resampling of image subsets matched in size to BLINK from a larger pool can substantially reorder model rankings, even when the subsets are statistically indistinguishable in difficulty. This finding reveals that small benchmark sizes amplify the impact of incidental sampling variation, making it difficult to distinguish genuine differences in model capability from sampling artifacts.
-          </p>
-
-          <div class="figureGrid2" style="margin-bottom: 0.75rem;">
-            <div>
-              <img src="assets/figures/DA2k_rank_heatmap_data_splits.png" alt="DA2k ranking heatmap across data splits" style="width: 100%; height: auto;">
-            </div>
-            <div>
-              <img src="assets/figures/SPair-71k_rank_heatmap_data_splits.png" alt="SPair ranking heatmap across data splits" style="width: 100%; height: auto;">
-            </div>
-          </div>
-          <p class="muted lbCaption" style="margin-top: 10px; margin-bottom: 2rem;">
-            <strong>Ranking instability across splits.</strong> Model rankings across 1,000 independent 100-sample splits for DA2k and SPair-71k, with the first 10 splits visualized on the x-axis, revealing substantial ranking volatility caused solely by i.i.d. resampling.
-          </p>
-
-          <h3 class="h2" style="margin-top: 3rem; margin-bottom: 1rem;">Visual marker style matters</h3>
-          <p class="muted" style="margin-bottom: 2rem; line-height: 1.6;">
-            We evaluated models across 16 distinct visual marker styles, systematically varying attributes like color, shape, size, and label placement to test robustness. We found that seemingly irrelevant design choices—such as switching a red circle to a blue square—can cause accuracy swings of up to 21% on the exact same image-question pairs. These fluctuations are severe enough to completely reshuffle leaderboards, effectively allowing weaker models to rank above stronger ones based solely on the style of the visual prompt. To help make this sensitivity measurable (and harder to ignore), we introduce <strong>VPBench</strong>: expanded, marker-diverse versions of existing visually prompted datasets that evaluate each example under multiple marker variants.
-          </p>
 
           <!-- Interactive marker comparison -->
           <div class="interactiveSection" aria-label="Interactive marker comparison">
             <div class="interactiveHeader">
-              <h3 class="h3">Interactive marker comparison</h3>
               <p class="muted">
                 Select a dataset and marker variant to see how accuracy and rankings change compared to the default.
               </p>
@@ -218,9 +213,9 @@
 
           <div class="lbSection" aria-label="Gaming benchmarks by changing markers">
             <div class="interactiveHeader">
-              <h3 class="h3">Gaming benchmarks by changing markers</h3>
+              <!-- <h3 class="h3">Gaming benchmarks by changing markers</h3> -->
               <p class="muted">
-                We demonstrate that visually prompted leaderboards can be effectively "gamed" by cherry-picking marker styles that favor specific models. For example, simply increasing the font size of a visual marker allowed us to artificially lift a weaker model, InternVL3-8B, to rank higher than the much larger Gemini 2.5 Pro.
+                We can also manipulate leaderboards by cherry-picking marker styles that favor specific models. Here’s one example.
               </p>
             </div>
 
@@ -431,58 +426,66 @@
             </div>
 
             <p class="muted lbCaption">
-              <strong>Leaderboards can be manipulated.</strong> Performance comparison — optimizing for InternVL3-8B's ranking on
-              BLINK relative depth by changing the visual marker.
+              <strong>Leaderboards can be manipulated.</strong> Performance comparison — optimizing for InternVL3-8B’s ranking on BLINK relative depth by changing the visual marker.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="jpeg-compression">
+        <div class="container">
+          <h2 class="h2">Source #3: JPEG compression (and other “invisible” changes)</h2>
+          <div class="prose">
+            <p>
+              The last source of instability we also found by accident. When running our experiments we noticed that we were getting different results
+              from each other, even when setting temperature to 0. Turns out the machines we were running on had different CUDA kernels or JPEG compression
+              rates. These seemingly insignificant numerical differences are imperceptible to humans, yet they lead to noticeable changes in benchmark rankings.
+            </p>
+            <p>
+              We see that compared to a non visually prompted benchmark, visually prompted tasks see a large amount of variability from an imperceptible
+              visual change.
             </p>
           </div>
 
-          <h3 class="h2" style="margin-top: 3rem; margin-bottom: 1rem;">JPEG compression matters</h3>
-          <p class="muted" style="line-height: 1.6; font-size: 16px; margin-bottom: 1.5rem;">
-            Even ostensibly irrelevant implementation details can significantly impact model performance on visually prompted tasks. We find that JPEG compression quality—a factor imperceptible to human evaluators—produces statistically significant changes in accuracy and rankings. Importantly, these compression effects are specific to visually prompted benchmarks; applying the same intervention to traditional VLM benchmarks like MMBench shows negligible impact, highlighting the unique fragility of visual prompting evaluations.
-          </p>
-
-          <div class="chartPanel" style="width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+          <div class="chartPanel" style="width: 90%; max-width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
             <img src="assets/figures/jpeg_compression.png" alt="JPEG compression quality effects on model rankings" style="width: 100%; height: auto;">
             <p class="muted lbCaption" style="margin-top: 10px;">
-              <strong>JPEG Compression can change ranks.</strong> JPEG compression quality can reorder rankings on visually prompted tasks (BLINK RD),
-              while rankings on traditional benchmarks (MME) remain comparatively stable.
+              <strong>JPEG compression can change ranks.</strong> JPEG compression quality can reorder rankings on visually prompted tasks, while rankings on traditional benchmarks remain comparatively stable.
             </p>
           </div>
         </div>
       </section>
 
-      <section class="section" id="conclusion">
+      <section class="section" id="takeaways">
         <div class="container">
-          <h2 class="h2">Conclusion</h2>
-          <p class="muted" style="line-height: 1.6; font-size: 16px;">
-            Benchmarks should measure ability, not fragility. Yet our results reveal a gap: visually prompted evaluations
-            <span aria-label="opening quote">&ldquo;</span>fall short of this standard<span aria-label="closing quote">&rdquo;</span>:
-            change a marker’s color, shift its label, compress an image differently, and entire leaderboards reshuffle. These shifts are not noise but
-            structural weaknesses, revealing that today's perception-focused VLM benchmarks are far more sensitive than the field assumes.
-          </p>
-          <p class="muted" style="line-height: 1.6; font-size: 16px; margin-top: 1rem;">
-            Although our demonstrations center on BLINK-style tasks, the pattern is unlikely to be isolated. Any benchmark that depends on explicit
-            visual markup or fine-grained spatial cues risks similar instability. If leaderboards can be flipped by choices orthogonal to task semantics,
-            they cannot be trusted to track genuine progress. To address this, we recommend evaluations should diversify visual prompts, report variance
-            in addition to scores, and standardize low-level settings that silently influence results. Our expanded <strong>VPBench</strong> is a step in
-            that direction, offering larger, marker-diverse test sets that reduce incidental variance. Stable measurement is a prerequisite for meaningful
-            comparison; until then, visually prompted leaderboards may be telling us more about their construction than about the models they rank.
-          </p>
+          <h2 class="h2">What can we do about it?</h2>
+          <div class="prose">
+            <p>
+              With all these sources of instability, what can we do about it? Well larger dataset sizes help a lot: for instance, the ranking changes you
+              see with JPEG compression decrease a lot when you increase your dataset size.
+            </p>
+            <p>
+              A good rule of thumb is if your confidence intervals are wide: you need more eval data. To help with this we released our expanded visually
+              prompted dataset VPBench, with ~10x the data.
+            </p>
+            <p>
+              More broadly, these results highlight a fundamental issue with visually prompted benchmarks: they often conflate visual reasoning ability
+              with sensitivity to superficial cues. Without addressing this fragility, leaderboard movements may say more about marker design than about
+              progress in visual understanding.
+            </p>
+          </div>
         </div>
       </section>
 
-      <section class="section" id="citation">
+      <section class="section" id="bibtex">
         <div class="container">
-          <h2 class="h2">Citation</h2>
-
+          <h2 class="h2">BibTeX</h2>
           <div class="bibBox">
             <div class="bibBox__header">
-              <div class="bibBox__label">BibTeX</div>
-              <button class="btn btn--small" type="button" data-copy-target="#bibtex">
-                Copy
-              </button>
+              <div class="bibBox__label">Copy/paste</div>
+              <button class="btn btn--small" type="button" data-copy-target="#bibtexCode">Copy</button>
             </div>
-            <pre class="bibtex" id="bibtex" style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;"><code>@inproceedings{vptblink2026fragile,
+            <pre class="bibtex" id="bibtexCode"><code>@inproceedings{vptblink2026fragile,
   title     = {Visually Prompted Benchmarks Are Surprisingly Fragile},
   author    = {Haiwen Feng and Long Lian and Lisa Dunlap and Jiahao Shu and XuDong Wang and Renhao Wang and Trevor Darrell and Alane Suhr and Angjoo Kanazawa},
   booktitle = {Arxiv},
@@ -497,6 +500,3 @@
     <script src="script.js"></script>
   </body>
 </html>
-
-
-

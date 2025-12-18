@@ -1,14 +1,18 @@
 /**
  * script.js
  *
- * Expected DOM:
- * - A button with [data-copy-target="#selector"] to copy the target element's textContent.
- *
- * Outputs/side-effects:
- * - Writes BibTeX text to the clipboard when supported.
- * - Temporarily updates the button label to confirm copy success/failure.
+ * Purpose:
+ * - Power interactive visualizations on the blog post (Plotly charts + tables) using CSV assets.
+ * - Support copying the BibTeX block to the clipboard (when supported).
  */
 
+/**
+ * Temporarily change a button label, then restore it.
+ *
+ * @param {HTMLButtonElement} button
+ * @param {string} label
+ * @returns {void}
+ */
 function setTempButtonLabel(button, label) {
   const original = button.textContent || "";
   button.textContent = label;
@@ -17,12 +21,24 @@ function setTempButtonLabel(button, label) {
   }, 1200);
 }
 
+/**
+ * Get the `textContent` of a DOM element.
+ *
+ * @param {string} selector - CSS selector for the target element.
+ * @returns {string | null} The element's textContent, or null if the element doesn't exist.
+ */
 function getElementText(selector) {
   const el = document.querySelector(selector);
   if (!el) return null;
   return el.textContent || "";
 }
 
+/**
+ * Copy text to clipboard if the Clipboard API is available.
+ *
+ * @param {string} text
+ * @returns {Promise<boolean>} Whether the copy succeeded.
+ */
 function copyTextToClipboard(text) {
   if (!navigator.clipboard || !navigator.clipboard.writeText) return Promise.resolve(false);
   return navigator.clipboard
@@ -30,27 +46,6 @@ function copyTextToClipboard(text) {
     .then(() => true)
     .catch(() => false);
 }
-
-document.addEventListener("click", (e) => {
-  const target = e.target;
-  if (!(target instanceof HTMLElement)) return;
-
-  const button = target.closest("[data-copy-target]");
-  if (!(button instanceof HTMLButtonElement)) return;
-
-  const selector = button.getAttribute("data-copy-target");
-  if (!selector) return;
-
-  const text = getElementText(selector);
-  if (text === null) {
-    setTempButtonLabel(button, "Missing target");
-    return;
-  }
-
-  copyTextToClipboard(text).then((ok) => {
-    setTempButtonLabel(button, ok ? "Copied" : "Copy failed");
-  });
-});
 
 /**
  * Parse a simple CSV string into headers + rows.
@@ -148,9 +143,6 @@ function updateVisualization(markerKey) {
     return '#6b7280'; // grey
   });
 
-  // Font sizes - explicitly set for each bar to ensure consistency
-  const fontSizes = models.map(() => 12);
-
   // Update Plotly bar chart
   const trace1 = {
     x: models,
@@ -168,7 +160,7 @@ function updateVisualization(markerKey) {
     text: deltas.map(d => d >= 0 ? `+${d.toFixed(1)}` : d.toFixed(1)),
     textposition: 'outside',
     textfont: { 
-      size: fontSizes, 
+      size: Array(models.length).fill(16), 
       color: deltaColors 
     }
   };
@@ -476,5 +468,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   // JPEG rank plot
   const jpegRows = await jpegRowsPromise;
   if (jpegRows) renderJpegRankChart(jpegRows);
+});
+
+// Copy BibTeX (or any other text target) buttons
+document.addEventListener("click", (e) => {
+  const target = e.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const button = target.closest("[data-copy-target]");
+  if (!(button instanceof HTMLButtonElement)) return;
+
+  const selector = button.getAttribute("data-copy-target");
+  if (!selector) return;
+
+  const text = getElementText(selector);
+  if (text === null) {
+    setTempButtonLabel(button, "Missing target");
+    return;
+  }
+
+  copyTextToClipboard(text).then((ok) => {
+    setTempButtonLabel(button, ok ? "Copied" : "Copy failed");
+  });
 });
 

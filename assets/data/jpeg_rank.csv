@@ -1,0 +1,77 @@
+benchmark,model,jpeg_quality,rank
+BLINK_RD,Llama 4 Scout,default,1
+BLINK_RD,Llama 4 Scout,jpeg70,1
+BLINK_RD,Llama 4 Scout,jpeg80,1
+BLINK_RD,Llama 4 Scout,jpeg90,1
+BLINK_RD,Gemini 2.5 Pro,default,2
+BLINK_RD,Gemini 2.5 Pro,jpeg70,4
+BLINK_RD,Gemini 2.5 Pro,jpeg80,5
+BLINK_RD,Gemini 2.5 Pro,jpeg90,2
+BLINK_RD,Gemini 2.5 Flash,default,2
+BLINK_RD,Gemini 2.5 Flash,jpeg70,2
+BLINK_RD,Gemini 2.5 Flash,jpeg80,2
+BLINK_RD,Gemini 2.5 Flash,jpeg90,4
+BLINK_RD,Qwen3-VL-8B,default,4
+BLINK_RD,Qwen3-VL-8B,jpeg70,4
+BLINK_RD,Qwen3-VL-8B,jpeg80,3
+BLINK_RD,Qwen3-VL-8B,jpeg90,3
+BLINK_RD,InternVL3-8B,default,4
+BLINK_RD,InternVL3-8B,jpeg70,7
+BLINK_RD,InternVL3-8B,jpeg80,7
+BLINK_RD,InternVL3-8B,jpeg90,8
+BLINK_RD,GPT-4.1,default,6
+BLINK_RD,GPT-4.1,jpeg70,3
+BLINK_RD,GPT-4.1,jpeg80,4
+BLINK_RD,GPT-4.1,jpeg90,5
+BLINK_RD,GPT-4o,default,7
+BLINK_RD,GPT-4o,jpeg70,6
+BLINK_RD,GPT-4o,jpeg80,6
+BLINK_RD,GPT-4o,jpeg90,6
+BLINK_RD,Qwen2.5-VL-7B,default,8
+BLINK_RD,Qwen2.5-VL-7B,jpeg70,9
+BLINK_RD,Qwen2.5-VL-7B,jpeg80,8
+BLINK_RD,Qwen2.5-VL-7B,jpeg90,7
+BLINK_RD,Gemma 3-4B,default,9
+BLINK_RD,Gemma 3-4B,jpeg70,8
+BLINK_RD,Gemma 3-4B,jpeg80,9
+BLINK_RD,Gemma 3-4B,jpeg90,9
+MME,Gemini 2.5 Pro,default,1
+MME,Gemini 2.5 Pro,jpeg70,1
+MME,Gemini 2.5 Pro,jpeg80,1
+MME,Gemini 2.5 Pro,jpeg90,1
+MME,Gemini 2.5 Flash,default,2
+MME,Gemini 2.5 Flash,jpeg70,3
+MME,Gemini 2.5 Flash,jpeg80,2
+MME,Gemini 2.5 Flash,jpeg90,2
+MME,GPT-4.1,default,3
+MME,GPT-4.1,jpeg70,2
+MME,GPT-4.1,jpeg80,3
+MME,GPT-4.1,jpeg90,3
+MME,GPT-4o,default,4
+MME,GPT-4o,jpeg70,4
+MME,GPT-4o,jpeg80,4
+MME,GPT-4o,jpeg90,4
+MME,Llama 4 Scout,default,5
+MME,Llama 4 Scout,jpeg70,5
+MME,Llama 4 Scout,jpeg80,5
+MME,Llama 4 Scout,jpeg90,5
+MME,Qwen3-VL-8B,default,6
+MME,Qwen3-VL-8B,jpeg70,7
+MME,Qwen3-VL-8B,jpeg80,6
+MME,Qwen3-VL-8B,jpeg90,6
+MME,InternVL3-8B,default,7
+MME,InternVL3-8B,jpeg70,6
+MME,InternVL3-8B,jpeg80,7
+MME,InternVL3-8B,jpeg90,7
+MME,Gemma 3-4B,default,8
+MME,Gemma 3-4B,jpeg70,8
+MME,Gemma 3-4B,jpeg80,8
+MME,Gemma 3-4B,jpeg90,8
+MME,Qwen2.5-VL-7B,default,9
+MME,Qwen2.5-VL-7B,jpeg70,9
+MME,Qwen2.5-VL-7B,jpeg80,9
+MME,Qwen2.5-VL-7B,jpeg90,9
+
+
+
+
