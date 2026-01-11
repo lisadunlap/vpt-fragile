@@ -1,539 +1,564 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
 
-    <title>Visually Prompted Tasks are Fragile</title>
-    <meta
-      name="description"
-      content="A blog post on why visually prompted VLM benchmarks can be surprisingly fragile: dataset size, marker style, and even JPEG compression can shift leaderboards."
-    />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
 
-    <!-- Open Graph (nice previews when sharing) -->
-    <meta property="og:title" content="Visually Prompted Tasks are Fragile" />
-    <meta
-      property="og:description"
-      content="Small, seemingly irrelevant details in visual prompting can shift accuracy and reorder VLM leaderboards."
-    />
-    <meta property="og:image" content="assets/figures/vpb_main.png" />
+  <title>Visually Prompted Tasks are Fragile</title>
+  <meta name="description"
+    content="A blog post on why visually prompted VLM benchmarks can be surprisingly fragile: dataset size, marker style, and even JPEG compression can shift leaderboards." />
 
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" href="assets/favicon/icon.png" />
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
-  </head>
+  <!-- Open Graph (nice previews when sharing) -->
+  <meta property="og:title" content="Visually Prompted Tasks are Fragile" />
+  <meta property="og:description"
+    content="Small, seemingly irrelevant details in visual prompting can shift accuracy and reorder VLM leaderboards." />
+  <meta property="og:image" content="assets/figures/vpb_main.png" />
 
-  <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="assets/favicon/icon.png" />
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+</head>
 
-    <header class="header" id="top">
-      <section class="hero">
-        <!-- <p class="hero__kicker">Blog post</p> -->
-        <h1 class="hero__title">Visually Prompted Tasks are Fragile: small design changes can shift leaderboards</h1>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-        <div class="ctaRow" aria-label="Links">
-          <a
-            class="btn btn--primary"
-            href="https://arxiv.org/html/2512.17875v1"
-            target="_blank"
-            rel="noreferrer"
-          >Paper</a>
-          <a
-          class="btn btn--primary"
-            href="https://github.com/HavenFeng/visual-prompt-bias"
-            target="_blank"
-            rel="noreferrer"
-          >Code</a>
-          <a
-          class="btn btn--primary"
-            href="https://huggingface.co/datasets/longlian/VPBench"
-            target="_blank"
-            rel="noreferrer"
-          >Dataset</a>
-        </div>
+  <header class="header" id="top">
+    <section class="hero">
+      <!-- <p class="hero__kicker">Blog post</p> -->
+      <h1 class="hero__title">Visually Prompted Tasks are Fragile: small design changes can shift leaderboards</h1>
 
-        <p class="hero__authors">
-          <span class="author">Haiwen Feng*</span><span class="sep">·</span>
-          <span class="author">Long Lian*</span><span class="sep">·</span>
-          <span class="author">Lisa Dunlap*</span><span class="sep">·</span>
-          <span class="author">Jiahao Shu</span><span class="sep">·</span>
-          <span class="author">XuDong Wang</span><span class="sep">·</span>
-          <span class="author">Renhao Wang</span><span class="sep">·</span>
-          <span class="author">Trevor Darrell</span><span class="sep">·</span>
-          <span class="author">Alane Suhr</span><span class="sep">·</span>
-          <span class="author">Angjoo Kanazawa</span>
-        </p>
-        <p class="hero__affils">UC Berkeley</p>
+      <div class="ctaRow" aria-label="Links">
+        <a class="btn btn--primary" href="https://arxiv.org/html/2512.17875v1" target="_blank"
+          rel="noreferrer">Paper</a>
+        <a class="btn btn--primary" href="https://github.com/HavenFeng/visual-prompt-bias" target="_blank"
+          rel="noreferrer">Code</a>
+        <a class="btn btn--primary" href="https://huggingface.co/datasets/longlian/VPBench" target="_blank"
+          rel="noreferrer">Dataset</a>
+      </div>
 
-        <p class="hero__tagline hero__tagline--tldr">
-          <strong>TL;DR</strong> Small, seemingly irrelevant details in visual prompting (marker style, sampling, compression) can shift accuracy and reorder VLM leaderboards.
-        </p>
-      </section>
-    </header>
+      <p class="hero__authors">
+        <a class="author" href="https://havenfeng.github.io">Haiwen Feng*</a><span class="sep">·</span>
+        <a class="author" href="https://tonylian.com">Long Lian*</a><span class="sep">·</span>
+        <a class="author" href="https://lisabdunlap.com">Lisa Dunlap*</a><span class="sep">·</span>
+        <a class="author" href="https://www.linkedin.com/in/jiahaoshu/?originalSubdomain=cn">Jiahao Shu</a><span
+          class="sep">·</span>
+        <a class="author" href="https://people.eecs.berkeley.edu/~xdwang/">XuDong Wang</a><span class="sep">·</span>
+        <a class="author" href="https://renwang435.github.io">Renhao Wang</a><span class="sep">·</span>
+        <a class="author" href="https://people.eecs.berkeley.edu/~trevor/">Trevor Darrell</a><span class="sep">·</span>
+        <a class="author" href="https://www.alanesuhr.com">Alane Suhr</a><span class="sep">·</span>
+        <a class="author" href="https://people.eecs.berkeley.edu/~kanazawa/">Angjoo Kanazawa</a>
+      </p>
+      <p class="hero__affils">UC Berkeley</p>
 
-    <main id="main" class="main">
-      <section class="section" id="intro">
-        <div class="container">
+      <p class="hero__tagline hero__tagline--tldr">
+        <strong>TL;DR</strong> Small details like marker color, dataset size, and JPEG compression can have a
+        disproportionate effect on VLM performance in visually prompted tasks, often leading to significant shifts in
+        leaderboard rankings.
+      </p>
+    </section>
+  </header>
 
-          <div class="prose">
-            <p>
-              For those who are not up to date with the state of evaluation in computer vision, a key question that everyone wants to answer is
-              how good is my model at seeing vs how good is my model at thinking. In other words, how can I measure a model’s visual skills
-              independent of its semantic knowledge?
-            </p>
-            <p>
-              This is a harder task than you might think — many visual question answering samples rely heavily on world knowledge: if my model got
-              the question below wrong, it’s hard to determine if it is because it doesn’t recognize this as a tower or because it doesn’t know that
-              this particular tower is in Paris.
-            </p>
-            <figure class="mediaCard" style="margin: 18px auto; width: 55%; max-width: 520px;">
-              <img
-                src="assets/figures/tower.jpeg"
-                alt="A tower photo used as an example of a world-knowledge-heavy visual question."
-                style="width: 100%; display: block; background: #fff;"
-              />
-              <figcaption class="caption">
-                <strong>Question:</strong> in what city was this photo taken?
-              </figcaption>
-            </figure>
-            <p>
-              One such benchmark that aims to measure this pure visual capabilities is called <strong>BLINK</strong>, containing problems that humans
-              can solve in “the blink of an eye”, indicating that they require more visual processing than pure world knowledge. These tasks are things
-              like determining which object in the image is closer to the camera or where objects are in relation to one another.
-            </p>
-            <figure class="mediaCard" style="margin: 18px auto; width: 90%; max-width: 100%;">
-              <img
-                src="assets/figures/tasks.png"
-                alt="Examples of tasks from BLINK."
-                style="width: 100%; display: block; background: #fff;"
-              />
-              <figcaption class="caption">Examples of tasks from BLINK.</figcaption>
-            </figure>
-            <p>
-              Datasets like BLINK has incredibly high human performance but very low VLM performance, with some top models doing only slightly better
-              than chance, and this has caused it to become a very popular benchmark for up in coming VLMs.
-            </p>
-          </div>
-        </div>
-      </section>
+  <main id="main" class="main">
+    <section class="section" id="intro">
+      <div class="container">
 
-      <section class="section" id="issue">
-        <div class="container">
-          <div class="prose">
-            <p>
-              <strong>So what’s the issue?</strong>
-              Well several of these tasks are visually prompted, meaning a marker is placed within the image to assist in the task. While this altering
-              of the image may seem inconsequential, we find that these visually prompted tasks are incredibly fragile: simply changing the marker from
-              red to blue can completely alter the leaderboard.
-            </p>
-            <figure class="mediaCard" style="margin: 18px 0;">
-              <img
-                src="assets/figures/vpb_main.png"
-                alt="Visually Prompted Tasks are Fragile: small design changes can shift leaderboards"
-                style="width: 100%; display: block; background: #fff;"
-              />
-              <figcaption class="caption">
-                <strong>Visually Prompted Tasks are Fragile:</strong> small design changes can shift leaderboards.
-              </figcaption>
-            </figure>
-            <p>
-              In this post we will delve into the different sources of fragility for these types of benchmarks and provide some guidance on how we can
-              improve upon them. While we use BLINK as an example of a popular dataset containing visually prompted tasks, this instability is seen across
-              these sorts of visually prompted tasks in general (we &lt;3 BLINK). To see how these changes affect leaderboards, we evaluate across 9 commonly
-              used VLM’s.
-            </p>
-            <p>Ready? Let’s jump in.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="dataset-size">
-        <div class="container">
-          <h2 class="h2">Source #1: dataset size</h2>
-          <div class="prose">
-            <p>
-              First let’s get a glaring source of instability out of the way: dataset size. Each per-task dataset split of blink is 100–200 samples,
-              which may seem like a reasonable amount, but since these tasks often get low accuracy (often only slightly above chance), the confidence
-              intervals are huge.
-            </p>
-            <p>
-              To show this, we created our own visually prompted benchmark VPBench, consisting of two tasks: relative depth and semantic correspondence.
-              These datasets have around 10x the samples and thus much smaller confidence intervals. However, if we randomly create BLINK-sized data splits
-              from VPBench, we still see that the model leaderboard across splits differs significantly.
-            </p>
-          </div>
-
-          <figure class="mediaCard" style="margin: 12px 0;">
-            <div style="padding: 14px;">
-              <div class="figureGrid2" style="margin-bottom: 0;">
-                <div>
-                  <div class="imgCrop imgCrop--top10" style="width: 80%; margin: 0 auto;">
-                    <img src="assets/figures/DA2k_rank_heatmap_data_splits.png" alt="VPBench Relative Depth ranking heatmap across data splits" style="width: 100%; height: auto; display: block;">
-                  </div>
-                </div>
-                <div>
-                  <div class="imgCrop imgCrop--top10" style="width: 80%; margin: 0 auto;">
-                    <img src="assets/figures/SPair-71k_rank_heatmap_data_splits.png" alt="VPBench Semantic Correspondence ranking heatmap across data splits" style="width: 100%; height: auto; display: block;">
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div class="prose">
+          <p>
+            For those who are not up to date with the state of evaluation in computer vision, a key question that
+            everyone wants to answer is
+            how good is my model at seeing vs how good is my model at thinking. In other words, how can I measure a
+            model’s visual skills
+            independent of its semantic knowledge?
+          </p>
+          <p>
+            This is a harder task than you might think — many visual question answering samples rely heavily on world
+            knowledge: if my model got
+            the question below wrong, it’s hard to determine if it is because it doesn’t recognize this as a tower or
+            because it doesn’t know that
+            this particular tower is in Paris.
+          </p>
+          <figure class="mediaCard" style="margin: 18px auto; width: 55%; max-width: 520px;">
+            <img src="assets/figures/tower.jpeg"
+              alt="A tower photo used as an example of a world-knowledge-heavy visual question."
+              style="width: 100%; display: block; background: #fff;" />
             <figcaption class="caption">
-              <strong>Ranking instability across splits.</strong> Model rankings across 1,000 independent 100-sample splits for VPBench Rel. Depth and VPBench Sem. Corr., with the first 10 splits visualized on the x-axis, revealing substantial ranking volatility caused solely by i.i.d. resampling.
+              <strong>Question:</strong> in what city was this photo taken?
             </figcaption>
           </figure>
+          <p>
+            One such benchmark that aims to measure this pure visual capabilities is called <strong>BLINK</strong>,
+            containing problems that humans
+            can solve in “the blink of an eye”, indicating that they require more visual processing than pure world
+            knowledge. These tasks are things
+            like determining which object in the image is closer to the camera or where objects are in relation to one
+            another.
+          </p>
+          <figure class="mediaCard" style="margin: 18px auto; width: 90%; max-width: 100%;">
+            <img src="assets/figures/tasks.png" alt="Examples of tasks from BLINK."
+              style="width: 100%; display: block; background: #fff;" />
+            <figcaption class="caption">Examples of tasks from BLINK.</figcaption>
+          </figure>
+          <p>
+            Datasets like BLINK has incredibly high human performance but very low VLM performance, with some top models
+            doing only slightly better
+            than chance, and this has caused it to become a very popular benchmark for up in coming VLMs.
+          </p>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="section" id="marker-style">
-        <div class="container">
-          <h2 class="h2">Source #2: marker style</h2>
-          <div class="prose">
-            <p>
-              Next is marker style. This whole investigation actually started because we realized that within the BLINK dataset itself there are different
-              visual markers: sometimes they are red, sometimes they are white, sometimes the text is above the circle, sometimes it’s to the right.
-            </p>
-            <p>
-              While this detail may seem completely inconsequential, we found huge accuracy shifts if you change the color, shape or size. In fact, we see
-              that we can manipulate the leaderboard in our favor (or in someone else’s disfavor) simply by strategically choosing a marker style.
-            </p>
-          </div>
+    <section class="section" id="issue">
+      <div class="container">
+        <div class="prose">
+          <p>
+            <strong>So what’s the issue?</strong>
+            Well several of these tasks are visually prompted, meaning a marker is placed within the image to assist in
+            the task. While this altering
+            of the image may seem inconsequential, we find that these visually prompted tasks are incredibly fragile:
+            simply changing the marker from
+            red to blue can completely alter the leaderboard.
+          </p>
+          <figure class="mediaCard" style="margin: 18px 0;">
+            <img src="assets/figures/vpb_main.png"
+              alt="Visually Prompted Tasks are Fragile: small design changes can shift leaderboards"
+              style="width: 100%; display: block; background: #fff;" />
+            <figcaption class="caption">
+              <strong>Visually Prompted Tasks are Fragile:</strong> small design changes can shift leaderboards.
+            </figcaption>
+          </figure>
+          <p>
+            In this post we will delve into the different sources of fragility for these types of benchmarks and provide
+            some guidance on how we can
+            improve upon them. While we use BLINK as an example of a popular dataset containing visually prompted tasks,
+            this instability is seen across
+            these sorts of visually prompted tasks in general (we &lt;3 BLINK). To see how these changes affect
+            leaderboards, we evaluate across 9 commonly
+            used VLM’s.
+          </p>
+          <p>Ready? Let’s jump in.</p>
+        </div>
+      </div>
+    </section>
 
-          <!-- Interactive marker comparison -->
-          <div class="interactiveSection" aria-label="Interactive marker comparison">
-            <div class="interactiveHeader">
-              <p class="muted">
-                Select a dataset and marker variant to see how accuracy and rankings change compared to the default.
-              </p>
-            </div>
+    <section class="section" id="dataset-size">
+      <div class="container">
+        <h2 class="h2">Source #1: dataset size</h2>
+        <div class="prose">
+          <p>
+            First let’s get a glaring source of instability out of the way: dataset size. Each per-task dataset split of
+            blink is 100–200 samples,
+            which may seem like a reasonable amount, but since these tasks often get low accuracy (often only slightly
+            above chance), the confidence
+            intervals are huge.
+          </p>
+          <p>
+            To show this, we created our own visually prompted benchmark VPBench, consisting of two tasks: relative
+            depth and semantic correspondence.
+            These datasets have around 10x the samples and thus much smaller confidence intervals. However, if we
+            randomly create BLINK-sized data splits
+            from VPBench, we still see that the model leaderboard across splits differs significantly.
+          </p>
+        </div>
 
-            <div class="datasetSelector" style="margin-bottom: 1rem;">
-              <label for="datasetSelect" style="font-weight: 600; margin-right: 0.5rem;">Dataset:</label>
-              <select id="datasetSelect" class="datasetSelect" style="padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.9rem;">
-                <option value="DA2k" selected>VPBench Rel. Depth</option>
-                <option value="SPair">VPBench Sem. Corr.</option>
-              </select>
-            </div>
-
-            <div class="markerSelector">
-              <button class="markerBtn markerBtn--active" data-marker="color_blue">Color: Blue</button>
-              <button class="markerBtn" data-marker="marker_square">Marker Type: Square</button>
-              <button class="markerBtn" data-marker="radius_3">Radius: 3</button>
-              <button class="markerBtn" data-marker="text_offset_below">Text Offset: Below</button>
-              <button class="markerBtn" data-marker="font_scale_0.2">Font Scale: 0.2</button>
-            </div>
-
-            <div class="interactiveGrid">
-              <div class="chartPanel">
-                <div id="accuracyChart" class="plotlyChart"></div>
+        <figure class="mediaCard" style="margin: 12px 0;">
+          <div style="padding: 14px;">
+            <div class="figureGrid2" style="margin-bottom: 0;">
+              <div>
+                <div class="imgCrop imgCrop--top10" style="width: 80%; margin: 0 auto;">
+                  <img src="assets/figures/DA2k_rank_heatmap_data_splits.png"
+                    alt="VPBench Relative Depth ranking heatmap across data splits"
+                    style="width: 100%; height: auto; display: block;">
+                </div>
               </div>
-              <div class="leaderboardPanel">
-                <table class="interactiveLb" id="interactiveLbTable">
-                  <thead>
-                    <tr>
-                      <th>Model</th>
-                      <th class="lbCell--center">Rank</th>
-                      <th class="lbCell--center">Δ Rank</th>
-                      <th class="lbCell--right">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody id="interactiveLbBody">
-                    <!-- Populated by JS -->
-                  </tbody>
-                </table>
+              <div>
+                <div class="imgCrop imgCrop--top10" style="width: 80%; margin: 0 auto;">
+                  <img src="assets/figures/SPair-71k_rank_heatmap_data_splits.png"
+                    alt="VPBench Semantic Correspondence ranking heatmap across data splits"
+                    style="width: 100%; height: auto; display: block;">
+                </div>
               </div>
             </div>
-
-            <p class="muted lbCaption">
-              <strong>Small marker changes cause large, model-specific accuracy shifts and rank shuffles.</strong>
-              Select a dataset and marker above to compare with the default evaluation.
-            </p>
           </div>
+          <figcaption class="caption">
+            <strong>Ranking instability across splits.</strong> Model rankings across 1,000 independent 100-sample
+            splits for VPBench Rel. Depth and VPBench Sem. Corr., with the first 10 splits visualized on the x-axis,
+            revealing substantial ranking volatility caused solely by i.i.d. resampling.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
 
-          <div class="lbSection" aria-label="Gaming benchmarks by changing markers">
-            <div class="interactiveHeader">
-              <!-- <h3 class="h3">Gaming benchmarks by changing markers</h3> -->
-              <p class="muted">
-                We can also manipulate leaderboards by cherry-picking marker styles that favor specific models. Here’s one example.
-              </p>
-            </div>
-
-            <div class="lbGrid" role="region" aria-label="Leaderboards under marker variants">
-              <section class="lbCard" aria-label="Default leaderboard">
-                <div class="lbHead">
-                  <div class="lbTitle">Default</div>
-                  <div class="lbSub">Standard Evaluation</div>
-                </div>
-                <table class="interactiveLb">
-                  <colgroup>
-                    <col class="lbColModel" />
-                    <col class="lbColRank" />
-                    <col class="lbColScore" />
-                  </colgroup>
-                  <thead>
-                    <tr>
-                      <th>Model</th>
-                      <th class="lbCell--center">Rank</th>
-                      <th class="lbCell--right">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Llama 4 Scout</td>
-                      <td class="lbCell--center"><span class="lbRank">#1</span></td>
-                      <td class="lbCell--right"><span class="lbScore">89.41%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemini 2.5 Flash</td>
-                      <td class="lbCell--center"><span class="lbRank">#2</span></td>
-                      <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemini 2.5 Pro</td>
-                      <td class="lbCell--center"><span class="lbRank">#2</span></td>
-                      <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
-                    </tr>
-                    <tr class="lbRow lbRow--highlight">
-                      <td>InternVL3-<wbr />8B</td>
-                      <td class="lbCell--center"><span class="lbRank">#4</span></td>
-                      <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Qwen3-VL-8B</td>
-                      <td class="lbCell--center"><span class="lbRank">#4</span></td>
-                      <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
-                    </tr>
-                    <tr>
-                      <td>GPT-4.1</td>
-                      <td class="lbCell--center"><span class="lbRank">#6</span></td>
-                      <td class="lbCell--right"><span class="lbScore">75.29%</span></td>
-                    </tr>
-                    <tr>
-                      <td>GPT-4o</td>
-                      <td class="lbCell--center"><span class="lbRank">#7</span></td>
-                      <td class="lbCell--right"><span class="lbScore">71.76%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Qwen2.5-VL-7B</td>
-                      <td class="lbCell--center"><span class="lbRank">#8</span></td>
-                      <td class="lbCell--right"><span class="lbScore">70.59%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemma 3-4B</td>
-                      <td class="lbCell--center"><span class="lbRank">#9</span></td>
-                      <td class="lbCell--right"><span class="lbScore">52.94%</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </section>
-
-              <section class="lbCard" aria-label="Deflate InternVL3-8B leaderboard">
-                <div class="lbHead">
-                  <div class="lbTitle">Deflate InternVL3-8B</div>
-                  <div class="lbSub">Marker Type Square</div>
-                </div>
-                <table class="interactiveLb">
-                  <colgroup>
-                    <col class="lbColModel" />
-                    <col class="lbColRank" />
-                    <col class="lbColScore" />
-                  </colgroup>
-                  <thead>
-                    <tr>
-                      <th>Model</th>
-                      <th class="lbCell--center">Rank</th>
-                      <th class="lbCell--right">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Llama 4 Scout</td>
-                      <td class="lbCell--center"><span class="lbRank">#1</span></td>
-                      <td class="lbCell--right"><span class="lbScore">90.59%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemini 2.5 Pro</td>
-                      <td class="lbCell--center"><span class="lbRank">#2</span></td>
-                      <td class="lbCell--right"><span class="lbScore">84.71%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Qwen3-VL-8B</td>
-                      <td class="lbCell--center"><span class="lbRank">#3</span></td>
-                      <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
-                    </tr>
-                    <tr>
-                      <td>GPT-4.1</td>
-                      <td class="lbCell--center"><span class="lbRank">#3</span></td>
-                      <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemini 2.5 Flash</td>
-                      <td class="lbCell--center"><span class="lbRank">#5</span></td>
-                      <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
-                    </tr>
-                    <tr>
-                      <td>GPT-4o</td>
-                      <td class="lbCell--center"><span class="lbRank">#6</span></td>
-                      <td class="lbCell--right"><span class="lbScore">75.29%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Qwen2.5-VL-7B</td>
-                      <td class="lbCell--center"><span class="lbRank">#7</span></td>
-                      <td class="lbCell--right"><span class="lbScore">67.06%</span></td>
-                    </tr>
-                    <tr class="lbRow lbRow--highlight">
-                      <td>InternVL3-<wbr />8B</td>
-                      <td class="lbCell--center"><span class="lbRank">#8</span></td>
-                      <td class="lbCell--right"><span class="lbScore">63.53%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemma 3-4B</td>
-                      <td class="lbCell--center"><span class="lbRank">#9</span></td>
-                      <td class="lbCell--right"><span class="lbScore">55.29%</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </section>
-
-              <section class="lbCard" aria-label="Inflate InternVL3-8B leaderboard">
-                <div class="lbHead">
-                  <div class="lbTitle">Inflate InternVL3-8B</div>
-                  <div class="lbSub">Font Scale 1.0</div>
-                </div>
-                <table class="interactiveLb">
-                  <colgroup>
-                    <col class="lbColModel" />
-                    <col class="lbColRank" />
-                    <col class="lbColScore" />
-                  </colgroup>
-                  <thead>
-                    <tr>
-                      <th>Model</th>
-                      <th class="lbCell--center">Rank</th>
-                      <th class="lbCell--right">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Llama 4 Scout</td>
-                      <td class="lbCell--center"><span class="lbRank">#1</span></td>
-                      <td class="lbCell--right"><span class="lbScore">85.88%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemini 2.5 Flash</td>
-                      <td class="lbCell--center"><span class="lbRank">#2</span></td>
-                      <td class="lbCell--right"><span class="lbScore">81.18%</span></td>
-                    </tr>
-                    <tr class="lbRow lbRow--highlight">
-                      <td>InternVL3-<wbr />8B</td>
-                      <td class="lbCell--center"><span class="lbRank">#3</span></td>
-                      <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Qwen3-VL-8B</td>
-                      <td class="lbCell--center"><span class="lbRank">#3</span></td>
-                      <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemini 2.5 Pro</td>
-                      <td class="lbCell--center"><span class="lbRank">#5</span></td>
-                      <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
-                    </tr>
-                    <tr>
-                      <td>GPT-4o</td>
-                      <td class="lbCell--center"><span class="lbRank">#6</span></td>
-                      <td class="lbCell--right"><span class="lbScore">72.94%</span></td>
-                    </tr>
-                    <tr>
-                      <td>GPT-4.1</td>
-                      <td class="lbCell--center"><span class="lbRank">#7</span></td>
-                      <td class="lbCell--right"><span class="lbScore">71.76%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Qwen2.5-VL-7B</td>
-                      <td class="lbCell--center"><span class="lbRank">#8</span></td>
-                      <td class="lbCell--right"><span class="lbScore">70.59%</span></td>
-                    </tr>
-                    <tr>
-                      <td>Gemma 3-4B</td>
-                      <td class="lbCell--center"><span class="lbRank">#9</span></td>
-                      <td class="lbCell--right"><span class="lbScore">49.41%</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </section>
-            </div>
-
-            <p class="muted lbCaption">
-              <strong>Leaderboards can be manipulated.</strong> Performance comparison — optimizing for InternVL3-8B’s ranking on BLINK relative depth by changing the visual marker.
-            </p>
-          </div>
+    <section class="section" id="marker-style">
+      <div class="container">
+        <h2 class="h2">Source #2: marker style</h2>
+        <div class="prose">
+          <p>
+            Next is marker style. This whole investigation actually started because we realized that within the BLINK
+            dataset itself there are different
+            visual markers: sometimes they are red, sometimes they are white, sometimes the text is above the circle,
+            sometimes it’s to the right.
+          </p>
+          <p>
+            While this detail may seem completely inconsequential, we found huge accuracy shifts if you change the
+            color, shape or size. In fact, we see
+            that we can manipulate the leaderboard in our favor (or in someone else’s disfavor) simply by strategically
+            choosing a marker style.
+          </p>
         </div>
-      </section>
 
-      <section class="section" id="jpeg-compression">
-        <div class="container">
-          <h2 class="h2">Source #3: JPEG compression (and other “invisible” changes)</h2>
-          <div class="prose">
-            <p>
-              The last source of instability we also found by accident. When running our experiments we noticed that we were getting different results
-              from each other, even when setting temperature to 0. Turns out the machines we were running on had different CUDA kernels or JPEG compression
-              rates. These seemingly insignificant numerical differences are imperceptible to humans, yet they lead to noticeable changes in benchmark rankings.
-            </p>
-            <p>
-              We see that compared to a non visually prompted benchmark, visually prompted tasks see a large amount of variability from an imperceptible
-              visual change.
+        <!-- Interactive marker comparison -->
+        <div class="interactiveSection" aria-label="Interactive marker comparison">
+          <div class="interactiveHeader">
+            <p class="muted">
+              Select a dataset and marker variant to see how accuracy and rankings change compared to the default.
             </p>
           </div>
 
-          <div class="chartPanel" style="width: 90%; max-width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
-            <img src="assets/figures/jpeg_compression.png" alt="JPEG compression quality effects on model rankings" style="width: 100%; height: auto;">
-            <p class="muted lbCaption" style="margin-top: 10px;">
-              <strong>JPEG compression can change ranks.</strong> Change in rank seen across JPEG compression rates. Individual dots with no lines indicate models whose rank remained constant across all compression levels. JPEG compression quality substantially reorders model rankings on visually-dependent tasks (BLINK RD), whereas rankings on traditional benchmarks (MME) exhibit greater stability.
-            </p>
+          <div class="datasetSelector" style="margin-bottom: 1rem;">
+            <label for="datasetSelect" style="font-weight: 600; margin-right: 0.5rem;">Dataset:</label>
+            <select id="datasetSelect" class="datasetSelect"
+              style="padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.9rem;">
+              <option value="DA2k" selected>VPBench Rel. Depth</option>
+              <option value="SPair">VPBench Sem. Corr.</option>
+            </select>
           </div>
-        </div>
-      </section>
 
-      <section class="section" id="takeaways">
-        <div class="container">
-          <h2 class="h2">What can we do about it?</h2>
-          <div class="prose">
-            <p>
-              With all these sources of instability, what can we do about it? Well larger dataset sizes help a lot: for instance, the ranking changes you
-              see with JPEG compression decrease a lot when you increase your dataset size.
-              A good rule of thumb is if your confidence intervals are wide: you need more eval data. To help with this we released our expanded visually
-              prompted dataset VPBench, with ~10x the data.
-            </p>
-            <p>
-              More broadly, these results highlight a fundamental issue with visually prompted benchmarks: they often conflate visual reasoning ability
-              with sensitivity to superficial cues. Without addressing this fragility, leaderboard movements may say more about marker design than about
-              progress in visual understanding.
-            </p>
+          <div class="markerSelector">
+            <button class="markerBtn markerBtn--active" data-marker="color_blue">Color: Blue</button>
+            <button class="markerBtn" data-marker="marker_square">Marker Type: Square</button>
+            <button class="markerBtn" data-marker="radius_3">Radius: 3</button>
+            <button class="markerBtn" data-marker="text_offset_below">Text Offset: Below</button>
+            <button class="markerBtn" data-marker="font_scale_0.2">Font Scale: 0.2</button>
           </div>
-        </div>
-      </section>
 
-      <section class="section" id="bibtex">
-        <div class="container">
-          <h2 class="h2">BibTeX</h2>
-          <div class="bibBox">
-            <div class="bibBox__header">
-              <div class="bibBox__label">Copy/paste</div>
-              <button class="btn btn--small" type="button" data-copy-target="#bibtexCode">Copy</button>
+          <div class="interactiveGrid">
+            <div class="chartPanel">
+              <div id="accuracyChart" class="plotlyChart"></div>
             </div>
-            <pre class="bibtex" id="bibtexCode"><code>@inproceedings{vptblink2026fragile,
+            <div class="leaderboardPanel">
+              <table class="interactiveLb" id="interactiveLbTable">
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th class="lbCell--center">Rank</th>
+                    <th class="lbCell--center">Δ Rank</th>
+                    <th class="lbCell--right">Score</th>
+                  </tr>
+                </thead>
+                <tbody id="interactiveLbBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <p class="muted lbCaption">
+            <strong>Small marker changes cause large, model-specific accuracy shifts and rank shuffles.</strong>
+            Select a dataset and marker above to compare with the default evaluation.
+          </p>
+        </div>
+
+        <div class="lbSection" aria-label="Gaming benchmarks by changing markers">
+          <div class="interactiveHeader">
+            <!-- <h3 class="h3">Gaming benchmarks by changing markers</h3> -->
+            <p class="muted">
+              We can also manipulate leaderboards by cherry-picking marker styles that favor specific models. Here’s one
+              example.
+            </p>
+          </div>
+
+          <div class="lbGrid" role="region" aria-label="Leaderboards under marker variants">
+            <section class="lbCard" aria-label="Default leaderboard">
+              <div class="lbHead">
+                <div class="lbTitle">Default</div>
+                <div class="lbSub">Standard Evaluation</div>
+              </div>
+              <table class="interactiveLb">
+                <colgroup>
+                  <col class="lbColModel" />
+                  <col class="lbColRank" />
+                  <col class="lbColScore" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th class="lbCell--center">Rank</th>
+                    <th class="lbCell--right">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Llama 4 Scout</td>
+                    <td class="lbCell--center"><span class="lbRank">#1</span></td>
+                    <td class="lbCell--right"><span class="lbScore">89.41%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemini 2.5 Flash</td>
+                    <td class="lbCell--center"><span class="lbRank">#2</span></td>
+                    <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemini 2.5 Pro</td>
+                    <td class="lbCell--center"><span class="lbRank">#2</span></td>
+                    <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
+                  </tr>
+                  <tr class="lbRow lbRow--highlight">
+                    <td>InternVL3-<wbr />8B</td>
+                    <td class="lbCell--center"><span class="lbRank">#4</span></td>
+                    <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Qwen3-VL-8B</td>
+                    <td class="lbCell--center"><span class="lbRank">#4</span></td>
+                    <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
+                  </tr>
+                  <tr>
+                    <td>GPT-4.1</td>
+                    <td class="lbCell--center"><span class="lbRank">#6</span></td>
+                    <td class="lbCell--right"><span class="lbScore">75.29%</span></td>
+                  </tr>
+                  <tr>
+                    <td>GPT-4o</td>
+                    <td class="lbCell--center"><span class="lbRank">#7</span></td>
+                    <td class="lbCell--right"><span class="lbScore">71.76%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Qwen2.5-VL-7B</td>
+                    <td class="lbCell--center"><span class="lbRank">#8</span></td>
+                    <td class="lbCell--right"><span class="lbScore">70.59%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemma 3-4B</td>
+                    <td class="lbCell--center"><span class="lbRank">#9</span></td>
+                    <td class="lbCell--right"><span class="lbScore">52.94%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section class="lbCard" aria-label="Deflate InternVL3-8B leaderboard">
+              <div class="lbHead">
+                <div class="lbTitle">Deflate InternVL3-8B</div>
+                <div class="lbSub">Marker Type Square</div>
+              </div>
+              <table class="interactiveLb">
+                <colgroup>
+                  <col class="lbColModel" />
+                  <col class="lbColRank" />
+                  <col class="lbColScore" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th class="lbCell--center">Rank</th>
+                    <th class="lbCell--right">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Llama 4 Scout</td>
+                    <td class="lbCell--center"><span class="lbRank">#1</span></td>
+                    <td class="lbCell--right"><span class="lbScore">90.59%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemini 2.5 Pro</td>
+                    <td class="lbCell--center"><span class="lbRank">#2</span></td>
+                    <td class="lbCell--right"><span class="lbScore">84.71%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Qwen3-VL-8B</td>
+                    <td class="lbCell--center"><span class="lbRank">#3</span></td>
+                    <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
+                  </tr>
+                  <tr>
+                    <td>GPT-4.1</td>
+                    <td class="lbCell--center"><span class="lbRank">#3</span></td>
+                    <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemini 2.5 Flash</td>
+                    <td class="lbCell--center"><span class="lbRank">#5</span></td>
+                    <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
+                  </tr>
+                  <tr>
+                    <td>GPT-4o</td>
+                    <td class="lbCell--center"><span class="lbRank">#6</span></td>
+                    <td class="lbCell--right"><span class="lbScore">75.29%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Qwen2.5-VL-7B</td>
+                    <td class="lbCell--center"><span class="lbRank">#7</span></td>
+                    <td class="lbCell--right"><span class="lbScore">67.06%</span></td>
+                  </tr>
+                  <tr class="lbRow lbRow--highlight">
+                    <td>InternVL3-<wbr />8B</td>
+                    <td class="lbCell--center"><span class="lbRank">#8</span></td>
+                    <td class="lbCell--right"><span class="lbScore">63.53%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemma 3-4B</td>
+                    <td class="lbCell--center"><span class="lbRank">#9</span></td>
+                    <td class="lbCell--right"><span class="lbScore">55.29%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section class="lbCard" aria-label="Inflate InternVL3-8B leaderboard">
+              <div class="lbHead">
+                <div class="lbTitle">Inflate InternVL3-8B</div>
+                <div class="lbSub">Font Scale 1.0</div>
+              </div>
+              <table class="interactiveLb">
+                <colgroup>
+                  <col class="lbColModel" />
+                  <col class="lbColRank" />
+                  <col class="lbColScore" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th class="lbCell--center">Rank</th>
+                    <th class="lbCell--right">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Llama 4 Scout</td>
+                    <td class="lbCell--center"><span class="lbRank">#1</span></td>
+                    <td class="lbCell--right"><span class="lbScore">85.88%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemini 2.5 Flash</td>
+                    <td class="lbCell--center"><span class="lbRank">#2</span></td>
+                    <td class="lbCell--right"><span class="lbScore">81.18%</span></td>
+                  </tr>
+                  <tr class="lbRow lbRow--highlight">
+                    <td>InternVL3-<wbr />8B</td>
+                    <td class="lbCell--center"><span class="lbRank">#3</span></td>
+                    <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Qwen3-VL-8B</td>
+                    <td class="lbCell--center"><span class="lbRank">#3</span></td>
+                    <td class="lbCell--right"><span class="lbScore">77.65%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemini 2.5 Pro</td>
+                    <td class="lbCell--center"><span class="lbRank">#5</span></td>
+                    <td class="lbCell--right"><span class="lbScore">76.47%</span></td>
+                  </tr>
+                  <tr>
+                    <td>GPT-4o</td>
+                    <td class="lbCell--center"><span class="lbRank">#6</span></td>
+                    <td class="lbCell--right"><span class="lbScore">72.94%</span></td>
+                  </tr>
+                  <tr>
+                    <td>GPT-4.1</td>
+                    <td class="lbCell--center"><span class="lbRank">#7</span></td>
+                    <td class="lbCell--right"><span class="lbScore">71.76%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Qwen2.5-VL-7B</td>
+                    <td class="lbCell--center"><span class="lbRank">#8</span></td>
+                    <td class="lbCell--right"><span class="lbScore">70.59%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gemma 3-4B</td>
+                    <td class="lbCell--center"><span class="lbRank">#9</span></td>
+                    <td class="lbCell--right"><span class="lbScore">49.41%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+          </div>
+
+          <p class="muted lbCaption">
+            <strong>Leaderboards can be manipulated.</strong> Performance comparison — optimizing for InternVL3-8B’s
+            ranking on BLINK relative depth by changing the visual marker.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="jpeg-compression">
+      <div class="container">
+        <h2 class="h2">Source #3: JPEG compression (and other “invisible” changes)</h2>
+        <div class="prose">
+          <p>
+            The last source of instability we also found by accident. When running our experiments we noticed that we
+            were getting different results
+            from each other, even when setting temperature to 0. Turns out the machines we were running on had different
+            CUDA kernels or JPEG compression
+            rates. These seemingly insignificant numerical differences are imperceptible to humans, yet they lead to
+            noticeable changes in benchmark rankings.
+          </p>
+          <p>
+            We see that compared to a non visually prompted benchmark, visually prompted tasks see a large amount of
+            variability from an imperceptible
+            visual change.
+          </p>
+        </div>
+
+        <div class="chartPanel"
+          style="width: 90%; max-width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+          <img src="assets/figures/jpeg_compression.png" alt="JPEG compression quality effects on model rankings"
+            style="width: 100%; height: auto;">
+          <p class="muted lbCaption" style="margin-top: 10px;">
+            <strong>JPEG compression can change ranks.</strong> Change in rank seen across JPEG compression rates.
+            Individual dots with no lines indicate models whose rank remained constant across all compression levels.
+            JPEG compression quality substantially reorders model rankings on visually-dependent tasks (BLINK RD),
+            whereas rankings on traditional benchmarks (MME) exhibit greater stability.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="takeaways">
+      <div class="container">
+        <h2 class="h2">What can we do about it?</h2>
+        <div class="prose">
+          <p>
+            With all these sources of instability, what can we do about it? Well larger dataset sizes help a lot: for
+            instance, the ranking changes you
+            see with JPEG compression decrease a lot when you increase your dataset size.
+            A good rule of thumb is if your confidence intervals are wide: you need more eval data. To help with this we
+            released our expanded visually
+            prompted dataset VPBench, with ~10x the data.
+          </p>
+          <p>
+            More broadly, these results highlight a fundamental issue with visually prompted benchmarks: they often
+            conflate visual reasoning ability
+            with sensitivity to superficial cues. Without addressing this fragility, leaderboard movements may say more
+            about marker design than about
+            progress in visual understanding.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="bibtex">
+      <div class="container">
+        <h2 class="h2">BibTeX</h2>
+        <div class="bibBox">
+          <div class="bibBox__header">
+            <div class="bibBox__label">Copy/paste</div>
+            <button class="btn btn--small" type="button" data-copy-target="#bibtexCode">Copy</button>
+          </div>
+          <pre class="bibtex" id="bibtexCode"><code>@inproceedings{vptblink2026fragile,
   title     = {Visually Prompted Benchmarks Are Surprisingly Fragile},
   author    = {Haiwen Feng and Long Lian and Lisa Dunlap and Jiahao Shu and XuDong Wang and Renhao Wang and Trevor Darrell and Alane Suhr and Angjoo Kanazawa},
   booktitle = {Arxiv},
   year      = {2026},
 }</code></pre>
-          </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <script src="script.js"></script>
-  </body>
+  <script src="script.js"></script>
+</body>
+
 </html>

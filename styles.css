@@ -104,6 +104,13 @@ pre {
 .hero__authors {
   margin-top: 6px;
 }
+.author {
+  transition: color 140ms ease;
+}
+.author:hover {
+  color: var(--teal);
+  text-decoration: underline;
+}
 .hero__affils {
   margin-top: 4px;
 }
